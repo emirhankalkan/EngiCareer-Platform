@@ -1,16 +1,43 @@
-# React + Vite
+# EngiCareer Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A specialized job and internship application platform developed for the IT and engineering sectors, tailored for candidates and companies.
 
-Currently, two official plugins are available:
+## About the Project
+This project was developed to prevent the clutter found on general career sites and to facilitate access to technology-focused job listings. Built using modern web technologies, the user experience is prioritized.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+*   **Advanced Filtering:** Filter listings by technology, location, and employment type.
+*   **User Roles:** Separate login and registration screens for Candidates and Companies.
+*   **Job Details:** Detailed pages displaying comprehensive job descriptions, requirements, and responsibilities.
+*   **Management Panel:** A dashboard for companies to track listings and applications.
+*   **Responsive Design:** Fully compatible with both mobile and desktop devices.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Technologies Used
 
-## Expanding the ESLint configuration
+*   **Frontend Framework:** React 18
+*   **Build Tool:** Vite
+*   **Styling:** Tailwind CSS
+*   **Routing:** React Router DOM v6
+*   **Icon Set:** Lucide React
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Installation and Execution
+
+To run the project in your local environment, follow these steps:
+
+1.  Download or clone the project to your computer.
+2.  Navigate to the project directory via terminal.
+3.  Run the following command to install necessary packages:
+    `npm install`
+4.  To start the application in development mode:
+    `npm run dev`
+5.  Open `http://localhost:5173` in your browser to view the application.
+
+## Project Structure
+
+*   `src/components`: Reusable UI components and layout structures.
+*   `src/pages`: Main pages of the application (Landing, Login, Jobs, etc.).
+*   `src/lib`: Helper functions and tools.
+
+---
+Group 4 - Design Processes Project

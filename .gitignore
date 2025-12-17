@@ -44,3 +44,6 @@ dist-ssr
 
 # ESLint
 .eslintcache
+
+# Build Logs
+build_log.txt
