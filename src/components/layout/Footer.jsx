@@ -60,7 +60,7 @@ export const Footer = () => {
             © 2025 TechArchive. Tüm hakları saklıdır.
           </p>
           <p className="text-slate-400 text-sm flex gap-1">
-             Designed by <span className="text-slate-600 font-medium">Group 4</span>
+             Designed by <span className="text-slate-600 font-medium">TechArchive Team</span>
           </p>
         </div>
       </div>

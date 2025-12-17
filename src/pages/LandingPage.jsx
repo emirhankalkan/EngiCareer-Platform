@@ -6,6 +6,18 @@ import { Input } from '../components/ui/Input';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 
+/**
+ * LANDING PAGE COMPONENT
+ * 
+ * DESIGN RATIONALE:
+ * This page serves as the entry point for the "Job and Internship Platform".
+ * It implements a "Hero Section" to immediately capture user attention with value propositions.
+ * 
+ * FEATURES:
+ * - Smart Search: Allows filtering by position and location.
+ * - Statistics: Displays platform growth to build trust (Social Proof).
+ * - Value Proposition: Highlights key differentiators like "Smart Matching".
+ */
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -13,7 +25,7 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-16 pb-32 lg:pt-32 lg:pb-40">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-7xl">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -71,7 +83,7 @@ const LandingPage = () => {
 
       {/* Stats Section */}
       <section className="py-12 bg-white border-y border-slate-100">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-7xl">
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <StatCard icon={TrendingUp} value="15,000+" label="Aktif İş İlanı" />
               <StatCard icon={Building2} value="3,500+" label="Şirket" />
@@ -82,7 +94,7 @@ const LandingPage = () => {
 
       {/* Features/Value Prop */}
       <section className="py-24 bg-slate-50">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 max-w-7xl">
              <div className="max-w-3xl mx-auto text-center mb-16">
                 <h2 className="text-3xl font-bold text-slate-900 mb-4">Neden TechArchive?</h2>
                 <p className="text-lg text-slate-600">Sadece mühendisler ve geliştiriciler için tasarlanmış özel deneyim.</p>

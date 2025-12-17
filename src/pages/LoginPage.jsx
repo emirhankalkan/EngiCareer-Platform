@@ -1,15 +1,43 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
+/**
+ * LOGIN PAGE
+ * 
+ * Handles user authentication via AuthContext.
+ * Simulates login by checking roles against mocked data.
+ */
 const LoginPage = () => {
   const [activeTab, setActiveTab] = useState('candidate'); // 'candidate' or 'company'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Simulate login based on the active tab role
+    // In a real app, email/password would be validated
+    const success = login(email, activeTab);
+    
+    if (success) {
+      // Redirect based on role
+      if (activeTab === 'company') {
+        navigate('/dashboard');
+      } else {
+        navigate('/jobs'); // Candidates go to job listings
+      }
+    } else {
+      alert('Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -52,10 +80,17 @@ const LoginPage = () => {
              </div>
 
              <div className="p-8">
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleLogin}>
                    <div>
                       <Label htmlFor="email">E-posta Adresi</Label>
-                      <Input id="email" type="email" placeholder="ornek@email.com" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder={activeTab === 'candidate' ? "ad.soyad@ornek.com" : "iletisim@sirket.com"}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
                    </div>
                    
                    <div>
@@ -65,10 +100,17 @@ const LoginPage = () => {
                           Şifremi unuttum?
                         </Link>
                       </div>
-                      <Input id="password" type="password" placeholder="••••••••" />
+                      <Input 
+                        id="password" 
+                        type="password" 
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required 
+                      />
                    </div>
 
-                   <Button className="w-full" size="lg">
+                   <Button className="w-full" size="lg" type="submit">
                       {activeTab === 'candidate' ? 'Aday Girişi Yap' : 'Şirket Girişi Yap'}
                    </Button>
                 </form>

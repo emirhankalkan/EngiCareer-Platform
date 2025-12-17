@@ -1,149 +1,180 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { JobCard } from '../components/JobCard';
 import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Label } from '../components/ui/Label';
 import { Search, MapPin, Filter } from 'lucide-react';
+import { JOBS } from '../data/mockData';
+import { useJobFilters } from '../hooks/useJobFilters';
 
-const MOCK_JOBS = [
-  {
-    id: 1,
-    title: 'Junior React Developer',
-    company: 'TechFlow Yazılım',
-    location: 'İstanbul (Hibrit)',
-    type: 'Tam Zamanlı',
-    salary: '₺25.000 - ₺35.000',
-    postedAt: '2 gün önce',
-    skills: ['React', 'TypeScript', 'Tailwind', 'Redux']
-  },
-  {
-    id: 2,
-    title: 'Yazılım Stajyeri (Backend)',
-    company: 'FinTech Solutions',
-    location: 'Ankara (Ofis)',
-    type: 'Staj',
-    salary: 'Maaş Belirtilmemiş',
-    postedAt: 'Yeni',
-    skills: ['Java', 'Spring Boot', 'PostgreSQL']
-  },
-  {
-    id: 3,
-    title: 'Full Stack Engineer',
-    company: 'Global Data Corp',
-    location: 'İzmir (Remote)',
-    type: 'Tam Zamanlı',
-    salary: '₺50.000 - ₺70.000',
-    postedAt: '1 hafta önce',
-    skills: ['Node.js', 'React', 'MongoDB', 'AWS']
-  },
-  {
-    id: 4,
-    title: 'DevOps Engineer',
-    company: 'CloudNine',
-    location: 'Remote',
-    type: 'Tam Zamanlı',
-    salary: '₺60.000+',
-    postedAt: '3 gün önce',
-    skills: ['Docker', 'Kubernetes', 'CI/CD']
-  },
-   {
-    id: 5,
-    title: 'Uzun Dönem Stajyer',
-    company: 'CyberSafe',
-    location: 'İstanbul',
-    type: 'Staj',
-    salary: 'Asgari Ücret',
-    postedAt: '5 saat önce',
-    skills: ['Python', 'Networking', 'Linux']
-  }
-];
+import { useAuth } from '../context/AuthContext';
 
 const JobsPage = () => {
+  const { user } = useAuth();
+  
+  // Smart Defaults: Check if user has preferences
+  const initialFilters = user?.preferences ? {
+      positions: user.preferences.positions || [],
+      skills: user.preferences.technologies || []
+  } : {};
+
+  // Use custom hook for robust filtering logic
+  const {
+    filteredJobs,
+    searchQuery,
+    setSearchQuery,
+    locationFilter,
+    setLocationFilter,
+    filters,
+    toggleFilter
+  } = useJobFilters(JOBS, initialFilters);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside className="w-full md:w-64 flex-shrink-0 space-y-8">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div className="flex items-center gap-2 mb-4 text-slate-900 font-semibold">
-                    <Filter className="h-5 w-5" /> Filtrele
-                </div>
-                
-                {/* Filter Sections */}
-                <div className="space-y-6">
-                    <div>
-                        <h4 className="text-sm font-medium text-slate-900 mb-3">Çalışma Şekli</h4>
-                        <div className="space-y-2">
-                           {['Tam Zamanlı', 'Yarı Zamanlı', 'Staj', 'Freelance'].map(item => (
-                               <div key={item} className="flex items-center gap-2">
-                                  <Checkbox id={item} />
-                                  <label htmlFor={item} className="text-sm text-slate-600">{item}</label>
-                               </div>
-                           ))}
-                        </div>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        
+        {/* Search Header */}
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-8 sticky top-20 z-30">
+           <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                 <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                 <Input 
+                   placeholder="Pozisyon, şirket veya anahtar kelime..." 
+                   className="pl-10"
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                 />
+              </div>
+              <div className="flex-1 relative">
+                 <MapPin className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                 <Input 
+                   placeholder="Şehir veya ilçe..." 
+                   className="pl-10" 
+                   value={locationFilter}
+                   onChange={(e) => setLocationFilter(e.target.value)}
+                 />
+              </div>
+              <Button size="lg" className="md:w-32">Ara</Button>
+           </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+           
+           {/* Filters Sidebar */}
+           <aside className="hidden lg:block space-y-8">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                 <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold border-b border-slate-100 pb-4">
+                    <Filter className="h-5 w-5" /> Filtreler
+                 </div>
+
+                 {/* Work Type Filter */}
+                 <div className="space-y-4 mb-8">
+                    <h3 className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Çalışma Şekli</h3>
+                    <div className="space-y-3">
+                       {['Tam Zamanlı', 'Yarı Zamanlı', 'Remote', 'Staj', 'Ofis'].map((type) => (
+                           <div key={type} className="flex items-center space-x-2">
+                             <Checkbox 
+                               id={`type-${type}`} 
+                               checked={filters.types.includes(type)}
+                               onCheckedChange={() => toggleFilter('types', type)}
+                             />
+                             <Label htmlFor={`type-${type}`}>{type}</Label>
+                           </div>
+                       ))}
                     </div>
+                 </div>
 
-                    <div className="border-t border-slate-100 pt-6">
-                        <h4 className="text-sm font-medium text-slate-900 mb-3">Konum</h4>
-                        <div className="space-y-2">
-                           {['İstanbul', 'Ankara', 'İzmir', 'Remote'].map(item => (
-                               <div key={item} className="flex items-center gap-2">
-                                  <Checkbox id={item} />
-                                  <label htmlFor={item} className="text-sm text-slate-600">{item}</label>
-                               </div>
-                           ))}
-                        </div>
-                    </div>
+                  {/* Location Category Filter */}
+                  <div className="space-y-4 mb-8">
+                     <h3 className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Konum</h3>
+                     <div className="space-y-3">
+                        {['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Eskişehir'].map((loc) => (
+                            <div key={loc} className="flex items-center space-x-2">
+                              <Checkbox 
+                                id={`loc-${loc}`} 
+                                checked={filters.locations.includes(loc)}
+                                onCheckedChange={() => toggleFilter('locations', loc)}
+                              />
+                              <Label htmlFor={`loc-${loc}`}>{loc}</Label>
+                            </div>
+                        ))}
+                     </div>
+                  </div>
 
-                    <div className="border-t border-slate-100 pt-6">
-                        <h4 className="text-sm font-medium text-slate-900 mb-3">Teknolojiler</h4>
-                        <div className="space-y-2">
-                           {['React', 'Java', 'Python', 'Node.js', '.NET'].map(item => (
-                               <div key={item} className="flex items-center gap-2">
-                                  <Checkbox id={item} />
-                                  <label htmlFor={item} className="text-sm text-slate-600">{item}</label>
-                               </div>
-                           ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </aside>
+                  {/* Position Filter (New) */}
+                  <div className="space-y-4 mb-8">
+                     <h3 className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Pozisyon</h3>
+                     <div className="space-y-3">
+                        {['Backend Developer', 'Frontend Developer', 'Full Stack', 'Mobile Developer', 'DevOps', 'Stajyer', 'Team Lead'].map((pos) => (
+                            <div key={pos} className="flex items-center space-x-2">
+                              <Checkbox 
+                                id={`pos-${pos}`} 
+                                checked={filters.positions?.includes(pos)} 
+                                onCheckedChange={() => toggleFilter('positions', pos)}
+                              />
+                              <Label htmlFor={`pos-${pos}`}>{pos}</Label>
+                            </div>
+                        ))}
+                     </div>
+                  </div>
 
-          {/* Main Content */}
-          <div className="flex-1">
-             {/* Search Header */}
-             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                   <Search className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
-                   <Input placeholder="Pozisyon adı, şirket veya yetenek ara..." className="pl-10 border-slate-200" />
-                </div>
-                 <div className="w-full sm:w-48 relative">
-                   <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
-                   <Input placeholder="Şehir" className="pl-10 border-slate-200" />
-                </div>
-             </div>
+                  {/* Tech Stack Filter (Expanded) */}
+                  <div className="space-y-4">
+                     <h3 className="font-semibold text-slate-700 text-sm uppercase tracking-wider">Teknolojiler</h3>
+                     <div className="space-y-3">
+                        {['React', 'Vue.js', 'Angular', 'Java', 'Spring Boot', '.NET', 'Python', 'Node.js', 'AWS', 'Docker', 'SQL'].map((tech) => (
+                            <div key={tech} className="flex items-center space-x-2">
+                              <Checkbox 
+                                id={`tech-${tech}`} 
+                                checked={filters.skills.includes(tech)}
+                                onCheckedChange={() => toggleFilter('skills', tech)}
+                              />
+                              <Label htmlFor={`tech-${tech}`}>{tech}</Label>
+                            </div>
+                        ))}
+                     </div>
+                  </div>
 
-             {/* Results Count */}
-             <div className="mb-4 text-slate-600 text-sm">
-                <strong>{MOCK_JOBS.length}</strong> ilan bulundu
-             </div>
+              </div>
+           </aside>
 
-             {/* Job List */}
-             <div className="space-y-4">
-                {MOCK_JOBS.map(job => (
-                   <JobCard key={job.id} job={job} />
-                ))}
-             </div>
-          </div>
+           {/* Job List */}
+           <div className="lg:col-span-3 space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                 <h2 className="font-bold text-slate-800 text-lg">
+                    {filteredJobs.length} İlan bulundu
+                 </h2>
+                 <span className="text-sm text-slate-500">
+                    En son eklenenler
+                 </span>
+              </div>
+
+              {filteredJobs.length > 0 ? (
+                  filteredJobs.map(job => (
+                    <JobCard key={job.id} job={job} />
+                  ))
+              ) : (
+                  <div className="text-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
+                      <h3 className="text-lg font-medium text-slate-900">Aradığınız kriterlere uygun ilan bulunamadı.</h3>
+                      <p className="text-slate-500 mt-2">Filtreleri temizleyerek tekrar deneyebilirsiniz.</p>
+                      <Button 
+                        variant="outline" 
+                        className="mt-4"
+                        onClick={() => window.location.reload()}
+                      >
+                        Filtreleri Temizle
+                      </Button>
+                  </div>
+              )}
+           </div>
+
         </div>
       </main>
-
       <Footer />
     </div>
   );
