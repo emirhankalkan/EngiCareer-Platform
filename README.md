@@ -40,4 +40,3 @@ To run the project in your local environment, follow these steps:
 *   `src/lib`: Helper functions and tools.
 
 ---
-Group 4 - Design Processes Project
