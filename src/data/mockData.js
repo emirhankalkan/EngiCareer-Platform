@@ -16,9 +16,49 @@ export const USERS = [
     name: 'Ali Yılmaz',
     title: 'Junior Software Engineer',
     skills: ['Java', 'Spring Boot', 'React', 'PostgreSQL'],
-    experience: 'Junior', // Intern, Junior, Mid, Senior
+    experience: 'Junior',
     location: 'Eskişehir',
     about: 'Bilgisayar Mühendisliği öğrencisi. Full stack web geliştirme üzerine odaklanıyorum.'
+  },
+  {
+    id: 10,
+    role: 'candidate',
+    name: 'Zeynep Çelik',
+    title: 'UI/UX Designer',
+    skills: ['Figma', 'Adobe XD', 'React', 'Tailwind CSS'],
+    experience: 'Mid',
+    location: 'Ankara',
+    about: 'Kullanıcı odaklı dijital deneyimler tasarlayan tutkulu bir tasarımcıyım.'
+  },
+  {
+    id: 11,
+    role: 'candidate',
+    name: 'Ahmet Yılmaz',
+    title: 'Backend Developer',
+    skills: ['Node.js', 'Express', 'MongoDB', 'Docker'],
+    experience: 'Junior',
+    location: 'İstanbul',
+    about: 'Ölçeklenebilir mikroservis mimarileri üzerine çalışıyorum.'
+  },
+  {
+    id: 12,
+    role: 'candidate',
+    name: 'Ayşe Demir',
+    title: 'Data Scientist',
+    skills: ['Python', 'Pandas', 'TensorFlow', 'SQL'],
+    experience: 'Mid',
+    location: 'İzmir',
+    about: 'Veri madenciliği ve makine öğrenmesi algoritmaları geliştiriyorum.'
+  },
+  {
+    id: 13,
+    role: 'candidate',
+    name: 'Mehmet Kaya',
+    title: 'Frontend Developer',
+    skills: ['Vue.js', 'React', 'TypeScript', 'Sass'],
+    experience: 'Junior',
+    location: 'Eskişehir',
+    about: 'ESOGU Bilgisayar Mühendisliği mezunuyum. Modern frontend teknolojilerine hakimim.'
   },
   {
     id: 2,
@@ -158,7 +198,9 @@ export const JOBS = [
     skills: ['React', 'TypeScript', 'Tailwind'],
     experience: 'Junior',
     postedAt: '2025-12-15T09:00:00',
-    matchScore: 95 // Calculated dynamically in real app, mocked here
+    matchScore: 95,
+    requirements: ['React deneyimi', 'Modern CSS bilgisi'],
+    responsibilities: ['UI geliştirmek', 'Kod kalitesini korumak']
   },
   {
     id: 102,
@@ -173,7 +215,9 @@ export const JOBS = [
     skills: ['Java', 'Spring Boot', 'SQL'],
     experience: 'Intern',
     postedAt: '2025-12-16T14:30:00',
-    matchScore: 88
+    matchScore: 88,
+    requirements: ['Temel Java bilgisi', 'SQL bilgisi'],
+    responsibilities: ['Backend projelerine destek olmak']
   },
   {
     id: 103,
@@ -188,7 +232,9 @@ export const JOBS = [
     skills: ['Python', 'SQL', 'Excel', 'Tableau'],
     experience: 'Mid',
     postedAt: '2025-12-10T11:20:00',
-    matchScore: 45
+    matchScore: 45,
+    requirements: ['Python bilgisi', 'Veri analizi deneyimi'],
+    responsibilities: ['Rapor hazırlamak']
   },
   {
     id: 104,
@@ -203,7 +249,9 @@ export const JOBS = [
     skills: ['Docker', 'Kubernetes', 'AWS', 'Linux'],
     experience: 'Senior',
     postedAt: '2025-12-14T16:45:00',
-    matchScore: 60
+    matchScore: 60,
+    requirements: ['Bulut sistemleri deneyimi', 'Yüksek erişilebilirlik bilgisi'],
+    responsibilities: ['Altyapı otomasyonu']
   },
   {
     id: 105,
@@ -418,7 +466,7 @@ export const JOBS = [
   {
       id: 119,
       companyId: 1,
-      company: 'TechFlow Yazılım', // Note: ID 1 wasn't in COMPANIES array initially but reusing logic
+      company: 'TechFlow Yazılım', 
       logo: 'TF',
       title: 'Project Manager',
       description: 'Yazılım projelerinin zamanında ve bütçeye uygun tesliminden sorumlu.',
@@ -429,6 +477,66 @@ export const JOBS = [
       experience: 'Senior',
       postedAt: '2025-12-11T09:15:00',
       matchScore: 55
+  },
+  {
+      id: 120,
+      companyId: 7,
+      company: 'CyberSafe',
+      logo: 'CS',
+      title: 'Siber Güvenlik Analisti',
+      description: 'Kurumsal ağ trafiğini izleyecek ve zafiyet analizleri yapacak ekip arkadaşları arıyoruz.',
+      type: 'Tam Zamanlı',
+      location: 'İstanbul',
+      salary: '₺50.000 - ₺80.000',
+      skills: ['Network', 'Linux', 'Pentest', 'SIEM'],
+      experience: 'Mid',
+      postedAt: '2025-12-24T10:00:00',
+      matchScore: 90
+  },
+  {
+      id: 121,
+      companyId: 6,
+      company: 'AI Labs',
+      logo: 'AL',
+      title: 'Yapay Zeka Araştırmacısı (NLP)',
+      description: 'Yeni nesil LLM modelleri ve doğal dil işleme algoritmaları üzerine çalışacak.',
+      type: 'Tam Zamanlı',
+      location: 'Teknopark İstanbul',
+      salary: '₺80.000 - ₺120.000',
+      skills: ['Python', 'PyTorch', 'NLP', 'Transformers'],
+      experience: 'Senior',
+      postedAt: '2025-12-25T09:00:00',
+      matchScore: 85
+  },
+  {
+      id: 122,
+      companyId: 2,
+      company: 'FinTech Solutions',
+      logo: 'FS',
+      title: 'Product Owner',
+      description: 'Ödeme sistemleri ürün yol haritasını yönetecek ve paydaşlarla koordinasyonu sağlayacak.',
+      type: 'Tam Zamanlı',
+      location: 'Ankara',
+      salary: '₺70.000 - ₺95.000',
+      skills: ['Agile', 'Jira', 'Product Strategy', 'Communication'],
+      experience: 'Senior',
+      postedAt: '2025-12-23T11:30:00',
+      matchScore: 70
+  },
+  {
+      id: 123,
+      companyId: 1,
+      company: 'TechFlow Yazılım',
+      logo: 'TF',
+      title: 'Database Administrator (DBA)',
+      description: 'Yüksek trafikli PostgreSQL ve MSSQL veritabanlarının yönetimi ve optimizasyonu.',
+      type: 'Tam Zamanlı',
+      location: 'İstanbul',
+      salary: '₺55.000 - ₺85.000',
+      skills: ['PostgreSQL', 'MSSQL', 'Performance Tuning', 'Backup'],
+      experience: 'Mid',
+      postedAt: '2025-12-22T14:45:00',
+      matchScore: 60
   }
 ];
 

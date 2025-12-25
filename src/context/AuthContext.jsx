@@ -40,26 +40,39 @@ export const AuthProvider = ({ children }) => {
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('user', JSON.stringify(foundUser));
+      // Simulate JWT Token (F-REQ-003)
+      localStorage.setItem('token', 'mock-jwt-token-' + Date.now());
       return true;
     }
     return false;
   };
 
   const register = (userData) => {
+      // 1. Unique Email Check (F-REQ-001)
+      const emailExists = registeredUsers.some(u => u.email === userData.email);
+      if (emailExists) {
+          throw new Error('E-posta adresi zaten kayıtlı.');
+      }
+
       const newUser = {
           id: Date.now(),
           ...userData
       };
+      
       // Update local state
       setRegisteredUsers(prev => [...prev, newUser]);
+      
       // Auto login
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
+      // Simulate JWT Token (F-REQ-003)
+      localStorage.setItem('token', 'mock-jwt-token-' + Date.now());
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

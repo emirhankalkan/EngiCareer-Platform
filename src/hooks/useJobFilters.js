@@ -1,13 +1,7 @@
 import { useState, useMemo } from 'react';
+import { calculateMatchScore } from '../utils/matchingAlgorithm';
 
-/**
- * useJobFilters Hook
- * Handles filtering logic for the Job Listing page.
- * 
- * @param {Array} jobs - The initial list of jobs from Mock Data
- * @returns {Object} - Filtered jobs and filter control functions
- */
-export const useJobFilters = (jobs, initialFilters = {}) => {
+export const useJobFilters = (jobs, initialFilters = {}, userProfile = null) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [filters, setFilters] = useState({
@@ -20,7 +14,7 @@ export const useJobFilters = (jobs, initialFilters = {}) => {
 
   // Filter Logic
   const filteredJobs = useMemo(() => {
-    return jobs.filter(job => {
+    const filtered = jobs.filter(job => {
       // 1. Text Search (Title or Company)
       const searchMatch = 
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,7 +42,15 @@ export const useJobFilters = (jobs, initialFilters = {}) => {
 
       return searchMatch && locationTextMatch && typeMatch && locCheckboxMatch && skillMatch && positionMatch;
     });
-  }, [jobs, searchQuery, locationFilter, filters]);
+
+    // F-REQ-031 & F-REQ-032: Calculate Match Score and Sort
+    const withScores = filtered.map(job => ({
+        ...job,
+        matchScore: userProfile ? calculateMatchScore(userProfile, job) : (job.matchScore || 0)
+    }));
+
+    return withScores.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+  }, [jobs, searchQuery, locationFilter, filters, userProfile]);
 
   // Toggle Checkbox Helper
   const toggleFilter = (category, value) => {
@@ -62,6 +64,17 @@ export const useJobFilters = (jobs, initialFilters = {}) => {
     });
   };
 
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setLocationFilter('');
+    setFilters({
+      types: [],
+      locations: [],
+      skills: [],
+      positions: []
+    });
+  };
+
   return {
     filteredJobs,
     searchQuery,
@@ -69,6 +82,7 @@ export const useJobFilters = (jobs, initialFilters = {}) => {
     locationFilter,
     setLocationFilter,
     filters,
-    toggleFilter
+    toggleFilter,
+    clearAllFilters
   };
 };
