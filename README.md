@@ -3,7 +3,10 @@
 A specialized job and internship application platform developed for the IT and engineering sectors, tailored for candidates and companies.
 
 ## About the Project
-EngiCareer is a full-stack IT and Engineering job portal developed as a term project for the **'Design Processes'** course at **Eskişehir Osmangazi University**. 
+EngiCareer is a full-stack IT and Engineering job portal project developed for the **'Design Processes'** course at **Eskişehir Osmangazi University**. 
+
+> [!NOTE]
+> This repository contains the **Frontend implementation** of the platform.
 
 This project was developed to provide a specialized platform for the technology sector, avoiding the clutter of general career sites. Built with modern web technologies (React, Vite, Tailwind CSS), it focuses on a premium user experience for both candidates and companies.
 
