@@ -67,9 +67,9 @@ const AboutPage = () => {
            <div className="container mx-auto px-4 text-center max-w-7xl">
               <h2 className="text-3xl font-bold text-slate-900 mb-12">Geliştirici Ekip</h2>
               <div className="flex flex-wrap justify-center gap-8">
-                 <TeamMember name="Zeynep Demir" role="Frontend Developer & UI/UX" />
-                 <TeamMember name="Ahmet Yılmaz" role="Backend Developer" />
-                 <TeamMember name="Mehmet Kaya" role="Database Administrator" />
+                 <TeamMember name="Dilara Alkınoğlu" role="Frontend Developer & UI/UX" />
+                 <TeamMember name="Emirhan Kalkan" role="Backend Developer" />
+                 <TeamMember name="Furkan Gemici" role="Database Administrator" />
               </div>
            </div>
         </section>

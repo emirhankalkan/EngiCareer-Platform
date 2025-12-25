@@ -10,6 +10,12 @@ import CompanyDashboard from './pages/CompanyDashboard';
 import CompaniesPage from './pages/CompaniesPage';
 import AboutPage from './pages/AboutPage';
 import CandidateApplicationsPage from './pages/CandidateApplicationsPage';
+import AdminDashboard from './pages/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
+import MessagesPage from './pages/MessagesPage';
+import BlogPage from './pages/BlogPage';
+import GuidePage from './pages/GuidePage';
+import LegalPage from './pages/LegalPage';
 
 // Helper to scroll to top on route change
 const ScrollToTop = () => {
@@ -37,6 +43,13 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/dashboard" element={<CompanyDashboard />} />
           <Route path="/applications" element={<CandidateApplicationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/guide" element={<GuidePage />} />
+          <Route path="/help" element={<LegalPage />} />
+          <Route path="/privacy" element={<LegalPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Router>
     </AuthProvider>

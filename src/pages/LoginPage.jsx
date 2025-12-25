@@ -96,7 +96,7 @@ const LoginPage = () => {
                    <div>
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="password" className="mb-0">Şifre</Label>
-                        <Link to="/forgot-password" class="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                        <Link to="/forgot-password" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
                           Şifremi unuttum?
                         </Link>
                       </div>

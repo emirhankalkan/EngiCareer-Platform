@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, TrendingUp, Users, Building2, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
@@ -61,7 +62,9 @@ const LandingPage = () => {
                     className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-transparent focus:ring-0 text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
-                <Button size="lg" className="md:w-auto w-full">İş Ara</Button>
+                <Link to="/jobs">
+                  <Button size="lg" className="md:w-auto w-full">İş Ara</Button>
+                </Link>
               </div>
               
               <div className="mt-8 flex items-center justify-center gap-6 text-sm text-slate-500">
@@ -96,7 +99,7 @@ const LandingPage = () => {
       <section className="py-24 bg-slate-50">
           <div className="container mx-auto px-4 max-w-7xl">
              <div className="max-w-3xl mx-auto text-center mb-16">
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">Neden TechArchive?</h2>
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">Neden EngiCareer?</h2>
                 <p className="text-lg text-slate-600">Sadece mühendisler ve geliştiriciler için tasarlanmış özel deneyim.</p>
              </div>
              

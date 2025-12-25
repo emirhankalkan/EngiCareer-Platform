@@ -24,7 +24,7 @@ export const Navbar = () => {
               <Briefcase className="h-6 w-6" />
             </div>
             <span className="text-xl font-bold tracking-tight text-slate-900">
-              TechArchive
+              EngiCareer
             </span>
           </Link>
         </div>
@@ -42,11 +42,21 @@ export const Navbar = () => {
                 <span className="hidden sm:block text-sm font-medium text-slate-700">
                     Merhaba, {user?.name}
                 </span>
-                <Link to={user?.role === 'company' ? '/dashboard' : '/applications'}>
-                    <Button variant="outline" size="sm">
-                        {user?.role === 'company' ? 'İlanlarım' : 'Geçmiş Başvurularım'}
-                    </Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link to={user?.role === 'company' ? '/dashboard' : '/profile'}>
+                      <Button variant="outline" size="sm">
+                          {user?.role === 'company' ? 'İlanlarım' : 'Profilim'}
+                      </Button>
+                  </Link>
+                  {user?.role === 'candidate' && (
+                    <Link to="/applications">
+                      <Button variant="ghost" size="sm">Başvurularım</Button>
+                    </Link>
+                  )}
+                  <Link to="/messages">
+                    <Button variant="ghost" size="sm">Mesajlar</Button>
+                  </Link>
+                </div>
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="text-red-500 hover:text-red-600 hover:bg-red-50">
                     <LogOut className="h-4 w-4" />
                 </Button>

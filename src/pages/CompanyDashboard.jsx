@@ -6,8 +6,9 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
-import { Briefcase, Users, LayoutDashboard, Settings, FileText, Plus, Check, X, Bell, Trash2, Edit, Save, BarChart } from 'lucide-react';
-import { APPLICATIONS, JOBS } from '../data/mockData';
+import { Briefcase, Users, LayoutDashboard, Settings, FileText, Plus, Check, X, Bell, Trash2, Edit, Save, BarChart, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { APPLICATIONS, JOBS, USERS } from '../data/mockData';
 
 const CompanyDashboard = () => {
    // State for Navigation
@@ -26,20 +27,59 @@ const CompanyDashboard = () => {
       location: 'İstanbul'
    });
 
+   // F-REQ-024: İstatistikler haftalık ve aylık seçenekli olmalıdır
+   const [statsPeriod, setStatsPeriod] = useState('weekly');
+   const [showJobModal, setShowJobModal] = useState(false);
+   const [newJobData, setNewJobData] = useState({
+       title: '',
+       type: 'Tam Zamanlı',
+       location: '',
+       salary: '',
+       skills: []
+   });
+
    // Simple Toast Notification Logic
    const showNotification = (message, type = 'success') => {
       setNotification({ message, type });
       setTimeout(() => setNotification(null), 3000);
    };
 
-   // Handle Application Status Change
+   // Handle Application Status Change (F-REQ-021)
    const updateStatus = (id, newStatus) => {
       setApplications(prev => prev.map(app => 
          app.id === id ? { ...app, status: newStatus } : app
       ));
       
-      const statusMsg = newStatus === 'Accepted' ? 'Başvuru onaylandı!' : 'Başvuru reddedildi.';
-      showNotification(statusMsg, newStatus === 'Accepted' ? 'success' : 'error');
+      const statusMessages = {
+         'Accepted': 'Aday mülakata çağrıldı!',
+         'Rejected': 'Başvuru olumsuz sonuçlandı.',
+         'OnHold': 'Başvuru 2. tura ertelendi.'
+      };
+      
+      showNotification(statusMessages[newStatus] || 'Durum güncellendi');
+   };
+
+   // Handle Job Creation (F-REQ-010, F-REQ-011)
+   const handleCreateJob = (e) => {
+       e.preventDefault();
+       if (newJobData.skills.length === 0) {
+           showNotification('En az bir teknoloji belirtmelisiniz!', 'error');
+           return;
+       }
+
+       const job = {
+           id: Date.now(),
+           companyId: 2,
+           company: 'TechFlow Yazılım',
+           ...newJobData,
+           status: 'Admin Approval', // F-REQ-011
+           postedAt: new Date().toISOString()
+       };
+
+       setJobs(prev => [job, ...prev]);
+       setShowJobModal(false);
+       setNewJobData({ title: '', type: 'Tam Zamanlı', location: '', salary: '', skills: [] });
+       showNotification('İlan oluşturuldu ve onaya gönderildi.');
    };
 
    // Mock Save Settings
@@ -94,13 +134,19 @@ const CompanyDashboard = () => {
                       active={activeView === 'jobs'} 
                       onClick={() => setActiveView('jobs')}
                    />
-                   <SidebarItem 
-                      icon={Users} 
-                      label="Adaylar" 
-                      active={activeView === 'candidates'} 
-                      badge={`${newApplications} Yeni`}
-                      onClick={() => setActiveView('candidates')}
-                   />
+                    <SidebarItem 
+                       icon={Users} 
+                       label="Aday Havuzu" 
+                       active={activeView === 'pool'} 
+                       onClick={() => setActiveView('pool')}
+                    />
+                    <SidebarItem 
+                       icon={Users} 
+                       label="Başvurular" 
+                       active={activeView === 'candidates'} 
+                       badge={`${newApplications} Yeni`}
+                       onClick={() => setActiveView('candidates')}
+                    />
                    <SidebarItem 
                       icon={FileText} 
                       label="Raporlar" 
@@ -125,12 +171,13 @@ const CompanyDashboard = () => {
                 <h1 className="text-2xl font-bold text-slate-900">
                    {activeView === 'overview' && 'Panel Özeti'}
                    {activeView === 'jobs' && 'Aktif İlanlarınız'}
-                   {activeView === 'candidates' && 'Tüm Başvurular'}
+                   {activeView === 'candidates' && 'Gelen Başvurular'}
+                   {activeView === 'pool' && 'Aday Havuzu'}
                    {activeView === 'reports' && 'Analiz ve Raporlar'}
                    {activeView === 'settings' && 'Şirket Ayarları'}
                 </h1>
                 {activeView === 'jobs' && (
-                   <Button><Plus className="h-4 w-4 mr-2" /> Yeni İlan Oluştur</Button>
+                   <Button onClick={() => setShowJobModal(true)}><Plus className="h-4 w-4 mr-2" /> Yeni İlan Oluştur</Button>
                 )}
              </div>
 
@@ -140,9 +187,35 @@ const CompanyDashboard = () => {
              {activeView === 'overview' && (
                <>
                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <StatBox label="Aktif İlanlar" value={activeJobsCount} change="+1 bu hafta" />
-                    <StatBox label="Toplam Başvuru" value={totalApplications} change="+24 bu hafta" />
-                    <StatBox label="Bekleyen İşlem" value={newApplications} change="Aksiyon gerekiyor" />
+                    <StatBox 
+                       label="Aktif İlanlar" 
+                       value={activeJobsCount} 
+                       change={statsPeriod === 'weekly' ? "+1 bu hafta" : "+4 bu ay"} 
+                    />
+                    <StatBox 
+                       label="Toplam Başvuru" 
+                       value={totalApplications} 
+                       change={statsPeriod === 'weekly' ? "+24 bu hafta" : "+112 bu ay"} 
+                    />
+                    <StatBox 
+                       label="Bekleyen İşlem" 
+                       value={newApplications} 
+                       change="Aksiyon gerekiyor" 
+                    />
+                 </div>
+                 
+                 {/* Period Toggle (F-REQ-024) */}
+                 <div className="flex justify-end">
+                    <div className="bg-slate-200 p-1 rounded-lg flex text-xs font-bold">
+                       <button 
+                          onClick={() => setStatsPeriod('weekly')}
+                          className={`px-3 py-1.5 rounded-md transition-all ${statsPeriod === 'weekly' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
+                       >Haftalık</button>
+                       <button 
+                          onClick={() => setStatsPeriod('monthly')}
+                          className={`px-3 py-1.5 rounded-md transition-all ${statsPeriod === 'monthly' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'}`}
+                       >Aylık</button>
+                    </div>
                  </div>
 
                  <Card className="p-0 overflow-hidden">
@@ -159,6 +232,50 @@ const CompanyDashboard = () => {
                </>
              )}
 
+             {/* 3.1 CANDIDATE POOL VIEW (New Requirement) */}
+             {activeView === 'pool' && (
+                <div className="space-y-6">
+                   <Card className="p-4">
+                      <div className="flex gap-4">
+                         <Input placeholder="Yetenek veya pozisyon ile aday ara..." className="max-w-md" />
+                         <Button variant="outline">Filtrele</Button>
+                      </div>
+                   </Card>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Filtering for candidates in mock data */}
+                      {USERS.filter(u => u.role === 'candidate').map(candidate => (
+                         <Card key={candidate.id} className="p-6 hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-4">
+                               <div className="flex items-center gap-4">
+                                  <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center text-lg font-bold text-indigo-700">
+                                     {candidate.name.charAt(0)}
+                                  </div>
+                                  <div>
+                                     <h4 className="font-bold text-slate-900">{candidate.name}</h4>
+                                     <p className="text-sm text-slate-500">{candidate.title}</p>
+                                  </div>
+                               </div>
+                               <Badge variant="secondary">{candidate.experience}</Badge>
+                            </div>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                               {candidate.skills.map((s, i) => (
+                                  <Badge key={i} variant="outline" className="text-[10px]">{s}</Badge>
+                               ))}
+                            </div>
+                             <div className="flex gap-2">
+                                <Link to="/profile" className="flex-1">
+                                   <Button size="sm" className="w-full">Profili Gör</Button>
+                                </Link>
+                                <Link to="/messages" className="flex-1">
+                                   <Button size="sm" variant="outline" className="w-full">Mesaj Gönder</Button>
+                                </Link>
+                             </div>
+                         </Card>
+                      ))}
+                   </div>
+                </div>
+             )}
+
              {/* 2. JOBS VIEW */}
              {activeView === 'jobs' && (
                 <div className="space-y-4">
@@ -171,13 +288,25 @@ const CompanyDashboard = () => {
                                <span>•</span>
                                <span>{job.location}</span>
                                <span>•</span>
-                               <span>{job.salary}</span>
+                               <Badge variant="secondary" className={job.status === 'Admin Approval' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}>
+                                  {job.status === 'Admin Approval' ? 'Onay Bekliyor' : 'Aktif'}
+                               </Badge>
                             </div>
                          </div>
-                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-2" /> Düzenle</Button>
-                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
-                         </div>
+                          <div className="flex gap-2">
+                             <Button variant="outline" size="sm" onClick={() => showNotification('Düzenleme ekranı yakında eklenecektir.')}><Edit className="h-4 w-4 mr-2" /> Düzenle</Button>
+                             <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => {
+                                   setJobs(prev => prev.filter(j => j.id !== job.id));
+                                   showNotification('İlan yayından kaldırıldı.', 'error');
+                                }}
+                             >
+                                <Trash2 className="h-4 w-4" />
+                             </Button>
+                          </div>
                       </Card>
                    ))}
                 </div>
@@ -285,6 +414,89 @@ const CompanyDashboard = () => {
                 </Card>
              )}
 
+             {/* Job Creation Modal (F-REQ-010) */}
+             {showJobModal && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden"
+                    >
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 className="text-xl font-bold text-slate-900">Yeni İlan Yayınla</h3>
+                            <button onClick={() => setShowJobModal(false)} className="text-slate-400 hover:text-slate-600"><X className="h-6 w-6" /></button>
+                        </div>
+                        <form onSubmit={handleCreateJob} className="p-6 space-y-4">
+                            <div>
+                                <Label htmlFor="jobTitle">İlan Başlığı</Label>
+                                <Input 
+                                    id="jobTitle" 
+                                    placeholder="Örn: Senior Java Developer" 
+                                    value={newJobData.title}
+                                    onChange={e => setNewJobData({...newJobData, title: e.target.value})}
+                                    required 
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="jobType">Çalışma Şekli</Label>
+                                    <select 
+                                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                                        value={newJobData.type}
+                                        onChange={e => setNewJobData({...newJobData, type: e.target.value})}
+                                    >
+                                        <option>Tam Zamanlı</option>
+                                        <option>Yarı Zamanlı</option>
+                                        <option>Staj</option>
+                                        <option>Remote</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label htmlFor="jobLoc">Konum</Label>
+                                    <Input 
+                                        id="jobLoc" 
+                                        placeholder="İstanbul" 
+                                        value={newJobData.location}
+                                        onChange={e => setNewJobData({...newJobData, location: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                               <Label>Gerekli Teknolojiler (F-REQ-010)</Label>
+                               <div className="flex flex-wrap gap-2 mt-2">
+                                  {['React', 'Java', 'Python', 'Go', 'SQL', 'AWS', 'Docker'].map(tech => (
+                                     <button
+                                        key={tech}
+                                        type="button"
+                                        onClick={() => {
+                                           setNewJobData(prev => ({
+                                              ...prev,
+                                              skills: prev.skills.includes(tech) 
+                                                 ? prev.skills.filter(t => t !== tech) 
+                                                 : [...prev.skills, tech]
+                                           }));
+                                        }}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                                           newJobData.skills.includes(tech) 
+                                           ? 'bg-indigo-600 text-white' 
+                                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        }`}
+                                     >
+                                        {tech}
+                                     </button>
+                                  ))}
+                               </div>
+                            </div>
+                            <div className="pt-4 flex gap-3">
+                                <Button type="button" variant="outline" className="flex-1" onClick={() => setShowJobModal(false)}>İptal</Button>
+                                <Button type="submit" className="flex-1">Onaya Gönder</Button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+             )}
+
           </div>
        </div>
     </div>
@@ -342,15 +554,24 @@ const ApplicationRow = ({ app, updateStatus }) => (
           <StatusBadge status={app.status} />
           
           {(app.status === 'Sent' || app.status === 'In Review') ? (
-             <div className="flex gap-2">
+            <div className="flex gap-2">
                 <Button 
                   size="sm" 
                   variant="outline" 
                   className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
-                  title="Onayla"
+                  title="Mülakata Çağır"
                   onClick={() => updateStatus(app.id, 'Accepted')}
                 >
                    <Check className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200"
+                  title="2. Tur"
+                  onClick={() => updateStatus(app.id, 'OnHold')}
+                >
+                   <Clock className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 
@@ -375,13 +596,15 @@ const StatusBadge = ({ status }) => {
       'In Review': 'bg-yellow-50 text-yellow-700',
       'Accepted': 'bg-green-50 text-green-700',
       'Rejected': 'bg-red-50 text-red-700',
+      'OnHold': 'bg-purple-50 text-purple-700',
    };
    
    return (
       <Badge className={`border-0 ${styles[status] || 'bg-slate-100'}`}>
          {status === 'Sent' ? 'Yeni' : 
           status === 'In Review' ? 'İnceleniyor' : 
-          status === 'Accepted' ? 'Kabul Edildi' : 'Reddedildi'}
+          status === 'Accepted' ? 'Mülakat' : 
+          status === 'OnHold' ? '2. Tur / Beklemede' : 'Reddedildi'}
       </Badge>
    );
 };

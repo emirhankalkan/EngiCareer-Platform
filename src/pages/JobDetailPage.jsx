@@ -5,40 +5,33 @@ import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Card } from '../components/ui/Card';
-import { MapPin, Clock, Building2, Banknote, Share2, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, Building2, Banknote, Share2, ArrowLeft, Users as UsersIcon, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { JOBS, APPLICATIONS } from '../data/mockData';
+import { calculateMatchScore } from '../utils/matchingAlgorithm';
 
 const JobDetailPage = () => {
   const { id } = useParams();
+  const { user } = useAuth();
 
-  // Mock data - in real app would fetch by ID
-  const job = {
-    title: 'Junior React Developer',
-    company: 'TechFlow Yazılım',
-    location: 'İstanbul (Hibrit)',
-    type: 'Tam Zamanlı',
-    salary: '₺25.000 - ₺35.000',
-    postedAt: '2 gün önce',
-    skills: ['React', 'TypeScript', 'Tailwind', 'Redux', 'Git'],
-    description: `
-      <p>TechFlow Yazılım olarak büyüyen ekibimize katılacak yetenekli bir Junior React Geliştirici arıyoruz.</p>
-      <p><br/></p>
-      <p>Modern teknoloji stack'imiz ile geliştirdiğimiz SaaS projelerinde görev alacak, deneyimli bir ekiple çalışma fırsatı bulacaksınız.</p>
-    `,
-    requirements: [
-      'Üniversitelerin ilgili mühendislik bölümlerinden mezun',
-      'React.js ve Javascript (ES6+) konusunda temel bilgi sahibi',
-      'HTML5, CSS3 ve Modern UI kütüphanelerine hakim (Tailwind tercih sebebidir)',
-      'REST API kullanımı konusunda deneyimli',
-      'Git versiyon kontrol sistemini kullanabilen',
-      'Öğrenmeye açık, takım çalışmasına yatkın'
-    ],
-    responsibilities: [
-      'Frontend arayüz bileşenlerinin geliştirilmesi',
-      'Backend ekibi ile koordineli çalışarak API entegrasyonlarının yapılması',
-      'Kod kalitesine özen gösterilmesi ve best-practice\'lerin uygulanması',
-      'UI/UX tasarımlarının teknik olarak hayata geçirilmesi'
-    ]
+  // Get job from mock data (F-REQ-014)
+  const job = JOBS.find(j => j.id === parseInt(id)) || JOBS[0];
+  
+  // Calculate application count (F-REQ-014)
+  const applicationCount = APPLICATIONS.filter(app => app.jobId === job.id).length;
+  
+  // Check if already applied (F-REQ-020)
+  const hasApplied = APPLICATIONS.some(app => app.jobId === job.id && app.candidateId === user?.id);
+  const [isApplying, setIsApplying] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(hasApplied);
+
+  const handleApply = () => {
+    setIsApplying(true);
+    setTimeout(() => {
+        setIsApplying(false);
+        setShowSuccess(true);
+    }, 1500);
   };
 
   return (
@@ -82,26 +75,46 @@ const JobDetailPage = () => {
                     <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full">
                       <Banknote className="h-4 w-4 text-green-600" /> {job.salary}
                     </div>
+                    <div className="flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-full text-indigo-700 font-medium">
+                      <UsersIcon className="h-4 w-4" /> {applicationCount} Başvuru
+                    </div>
+                    {user?.role === 'candidate' && (
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold ${
+                           calculateMatchScore(user, job) >= 80 ? 'bg-green-100 text-green-700' : 
+                           calculateMatchScore(user, job) >= 50 ? 'bg-yellow-100 text-yellow-700' :
+                           'bg-slate-100 text-slate-600'
+                        }`}>
+                           %{calculateMatchScore(user, job)} Uyum Skorunuz
+                        </div>
+                     )}
                  </div>
 
-                 <div className="prose prose-slate max-w-none">
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">İş Tanımı</h3>
-                    <div dangerouslySetInnerHTML={{ __html: job.description }} className="text-slate-600 mb-6" />
+                  <div className="prose prose-slate max-w-none">
+                     <h3 className="text-lg font-bold text-slate-900 mb-4">İş Tanımı</h3>
+                     <div className="text-slate-600 mb-6">{job.description}</div>
 
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">Aranan Nitelikler</h3>
-                    <ul className="list-disc pl-5 space-y-2 text-slate-600 mb-6">
-                       {job.requirements.map((req, i) => (
-                          <li key={i}>{req}</li>
-                       ))}
-                    </ul>
+                     {(job.requirements && job.requirements.length > 0) && (
+                        <>
+                           <h3 className="text-lg font-bold text-slate-900 mb-4">Aranan Nitelikler</h3>
+                           <ul className="list-disc pl-5 space-y-2 text-slate-600 mb-6">
+                              {job.requirements.map((req, i) => (
+                                 <li key={i}>{req}</li>
+                              ))}
+                           </ul>
+                        </>
+                     )}
 
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">Sorumluluklar</h3>
-                    <ul className="list-disc pl-5 space-y-2 text-slate-600">
-                       {job.responsibilities.map((resp, i) => (
-                          <li key={i}>{resp}</li>
-                       ))}
-                    </ul>
-                 </div>
+                     {(job.responsibilities && job.responsibilities.length > 0) && (
+                        <>
+                           <h3 className="text-lg font-bold text-slate-900 mb-4">Sorumluluklar</h3>
+                           <ul className="list-disc pl-5 space-y-2 text-slate-600">
+                              {job.responsibilities.map((resp, i) => (
+                                 <li key={i}>{resp}</li>
+                              ))}
+                           </ul>
+                        </>
+                     )}
+                  </div>
               </Card>
            </div>
 
@@ -113,8 +126,27 @@ const JobDetailPage = () => {
                    Bu ilana başvurmak için profilinizin güncel olduğundan emin olun.
                  </p>
                  
-                 <Button className="w-full mb-4" size="lg">Hemen Başvur</Button>
-                 <Button variant="secondary" className="w-full">Kaydet</Button>
+                 <Button 
+                   className="w-full mb-4" 
+                   size="lg" 
+                   onClick={handleApply}
+                   disabled={isApplying || showSuccess}
+                 >
+                   {isApplying ? 'Başvuruluyor...' : showSuccess ? 'Başvuruldu' : 'Hemen Başvur'}
+                 </Button>
+                 <Button variant="secondary" className="w-full" onClick={() => showSuccess ? null : alert('İlan kaydedildi!')}>
+                   {showSuccess ? 'Kaydedildi' : 'Kaydet'}
+                 </Button>
+                 
+                 {showSuccess && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-4 p-3 bg-green-50 border border-green-100 rounded-lg flex items-center gap-2 text-green-700 text-sm font-medium"
+                    >
+                      <CheckCircle className="h-4 w-4" /> Başvurunuz başarıyla iletildi!
+                    </motion.div>
+                 )}
                  
                  <div className="mt-8 pt-6 border-t border-slate-100">
                     <h4 className="font-semibold text-slate-900 mb-3">Gerekli Yetenekler</h4>

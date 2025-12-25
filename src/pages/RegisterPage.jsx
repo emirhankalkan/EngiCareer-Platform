@@ -24,12 +24,15 @@ const RegisterPage = () => {
       email: '',
       password: '',
       companyName: '',
+      taxNumber: '', // F-REQ-002: Vergi numarası
       positions: [], // Selected positions (Array)
       skills: []
   });
 
-  const POSITIONS = ['Backend Developer', 'Frontend Developer', 'Full Stack', 'Mobile Developer', 'DevOps', 'Stajyer', 'Team Lead'];
-  const TECHNOLOGIES = ['React', 'Java', 'Python', 'Spring Boot', 'Node.js', 'SQL', 'AWS', 'Docker'];
+  const [error, setError] = useState('');
+
+  const POSITIONS = ['Backend Developer', 'Frontend Developer', 'Full Stack', 'Mobile Developer', 'DevOps', 'Stajyer', 'Team Lead', 'Siber Güvenlik', 'Yapay Zeka', 'Product Owner', 'Data Scientist'];
+  const TECHNOLOGIES = ['React', 'Java', 'Python', 'Spring Boot', 'Node.js', 'SQL', 'AWS', 'Docker', 'MSSQL', 'PostgreSQL', 'Next.js', 'Kubernetes', 'Figma', 'NLP'];
 
   const handleNext = (e) => {
       e.preventDefault();
@@ -42,6 +45,20 @@ const RegisterPage = () => {
 
   const handleSubmit = (e) => {
       e.preventDefault();
+      setError('');
+
+      // Validation for Candidates (F-REQ-004: En az 2 teknik beceri)
+      if (activeTab === 'candidate' && formData.skills.length < 2) {
+          setError('Profil oluşturmak için en az 2 teknik beceri seçmelisiniz.');
+          setStep(2);
+          return;
+      }
+
+      // Validation for Companies (F-REQ-002: Vergi numarası doğrulaması)
+      if (activeTab === 'company' && !formData.taxNumber) {
+          setError('Lütfen şirket vergi numarasını giriniz.');
+          return;
+      }
       
       // Auto-assign title based on selected position for candidates
       const roleData = activeTab === 'candidate' ? {
@@ -54,7 +71,8 @@ const RegisterPage = () => {
           }
       } : {
           role: 'company',
-          name: formData.companyName
+          name: formData.companyName,
+          taxNumber: formData.taxNumber
       };
 
       const finalUser = {
@@ -63,8 +81,13 @@ const RegisterPage = () => {
           ...roleData
       };
 
-      register(finalUser);
-      navigate(activeTab === 'candidate' ? '/jobs' : '/dashboard');
+      try {
+          register(finalUser);
+          navigate(activeTab === 'candidate' ? '/jobs' : '/dashboard');
+      } catch (err) {
+          setError(err.message);
+          setStep(1);
+      }
   };
 
   const togglePosition = (pos) => {
@@ -197,15 +220,36 @@ const RegisterPage = () => {
                            </div>
 
                            {activeTab === 'company' && (
-                             <div>
-                                <Label htmlFor="companyName">Şirket Adı</Label>
-                                <Input 
-                                    id="companyName" 
-                                    placeholder="Şirketinizin Adı" 
-                                    value={formData.companyName}
-                                    onChange={e => setFormData({...formData, companyName: e.target.value})}
-                                />
+                             <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="companyName">Şirket Adı</Label>
+                                    <Input 
+                                        id="companyName" 
+                                        placeholder="Şirketinizin Adı" 
+                                        value={formData.companyName}
+                                        onChange={e => setFormData({...formData, companyName: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="taxNumber">Vergi Numarası (F-REQ-002)</Label>
+                                    <Input 
+                                        id="taxNumber" 
+                                        placeholder="10 haneli vergi numarası" 
+                                        value={formData.taxNumber}
+                                        onChange={e => setFormData({...formData, taxNumber: e.target.value})}
+                                        required
+                                        maxLength={10}
+                                    />
+                                    <p className="text-[10px] text-slate-400 mt-1">Sistem tarafından otomatik doğrulanacaktır.</p>
+                                </div>
                              </div>
+                           )}
+
+                           {error && (
+                               <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-xs text-red-600 animate-in fade-in slide-in-from-top-1">
+                                   {error}
+                               </div>
                            )}
 
                            <div className="pt-2">
@@ -271,6 +315,12 @@ const RegisterPage = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {error && (
+                                <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-xs text-red-600">
+                                    {error}
+                                </div>
+                            )}
 
                             <Button className="w-full mt-6" size="lg" type="submit">
                                 Kaydı Tamamla

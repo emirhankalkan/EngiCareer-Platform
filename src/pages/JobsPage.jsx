@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { JobCard } from '../components/JobCard';
@@ -6,6 +7,8 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Checkbox } from '../components/ui/Checkbox';
 import { Label } from '../components/ui/Label';
+import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 import { Search, MapPin, Filter } from 'lucide-react';
 import { JOBS } from '../data/mockData';
 import { useJobFilters } from '../hooks/useJobFilters';
@@ -29,8 +32,24 @@ const JobsPage = () => {
     locationFilter,
     setLocationFilter,
     filters,
-    toggleFilter
-  } = useJobFilters(JOBS, initialFilters);
+    toggleFilter,
+    clearAllFilters
+  } = useJobFilters(JOBS, initialFilters, user);
+
+  // Pagination Logic (F-REQ-012)
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  
+  const paginatedJobs = filteredJobs.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, searchQuery, locationFilter]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -144,7 +163,37 @@ const JobsPage = () => {
            </aside>
 
            {/* Job List */}
-           <div className="lg:col-span-3 space-y-4">
+           <div className="lg:col-span-3 space-y-6">
+              
+              {/* Personalized Suggestions (New Requirement) */}
+              {user?.role === 'candidate' && (
+                <Card className="p-6 bg-indigo-600 text-white overflow-hidden relative group">
+                   <div className="absolute right-[-20px] top-[-20px] h-40 w-40 bg-white/10 rounded-full blur-3xl group-hover:scale-110 transition-transform" />
+                   <h3 className="text-xl font-bold mb-4 flex items-center gap-2 relative z-10">
+                      ✨ Sizin İçin Akıllı Eşleşmeler
+                   </h3>
+                   <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide relative z-10">
+                      {JOBS.filter(j => j.matchScore > 80).slice(0, 3).map(job => (
+                        <div key={job.id} className="min-w-[280px] bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:bg-white/20 transition-colors">
+                           <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-bold truncate pr-8">{job.title}</h4>
+                              <Badge className="bg-white text-indigo-600 border-0 text-[10px] font-bold">%{job.matchScore} Match</Badge>
+                           </div>
+                           <p className="text-xs text-indigo-100 mb-3">{job.company}</p>
+                           <div className="flex flex-wrap gap-1 mb-4">
+                              {job.skills.slice(0, 2).map((s, i) => (
+                                <span key={i} className="text-[10px] bg-white/20 px-2 py-0.5 rounded text-white">{s}</span>
+                              ))}
+                           </div>
+                           <Link to={`/jobs/${job.id}`}>
+                              <Button size="sm" variant="secondary" className="w-full bg-white text-indigo-600 hover:bg-indigo-50 border-0 text-xs font-bold">Detaylara Git</Button>
+                           </Link>
+                        </div>
+                      ))}
+                   </div>
+                </Card>
+              )}
+
               <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-slate-800 text-lg">
                     {filteredJobs.length} İlan bulundu
@@ -154,8 +203,8 @@ const JobsPage = () => {
                  </span>
               </div>
 
-              {filteredJobs.length > 0 ? (
-                  filteredJobs.map(job => (
+              {paginatedJobs.length > 0 ? (
+                  paginatedJobs.map(job => (
                     <JobCard key={job.id} job={job} />
                   ))
               ) : (
@@ -165,7 +214,7 @@ const JobsPage = () => {
                       <Button 
                         variant="outline" 
                         className="mt-4"
-                        onClick={() => window.location.reload()}
+                        onClick={clearAllFilters}
                       >
                         Filtreleri Temizle
                       </Button>
@@ -174,6 +223,38 @@ const JobsPage = () => {
            </div>
 
         </div>
+            {/* Pagination Controls (F-REQ-012) */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8 pb-12">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                  Önceki
+                </Button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <Button
+                    key={i + 1}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(i + 1)}
+                    className="w-10 text-xs"
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  Sonraki
+                </Button>
+              </div>
+            )}
       </main>
       <Footer />
     </div>

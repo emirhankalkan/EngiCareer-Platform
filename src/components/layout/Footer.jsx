@@ -12,7 +12,7 @@ export const Footer = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
                 <Briefcase className="h-5 w-5" />
               </div>
-              <span className="text-lg font-bold text-slate-900">TechArchive</span>
+              <span className="text-lg font-bold text-slate-900">EngiCareer</span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed">
               Mühendislik ve IT dünyasında kariyerinizi şekillendirin. En iyi şirketlerle yeteneklerinizi buluşturuyoruz.
@@ -24,7 +24,6 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm text-slate-600">
               <li><Link to="/jobs" className="hover:text-indigo-600">İş İlanları</Link></li>
               <li><Link to="/companies" className="hover:text-indigo-600">Şirketler</Link></li>
-              <li><Link to="/pricing" className="hover:text-indigo-600">Fiyatlandırma</Link></li>
               <li><Link to="/about" className="hover:text-indigo-600">Hakkımızda</Link></li>
             </ul>
           </div>
@@ -57,10 +56,10 @@ export const Footer = () => {
         
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-400 text-sm">
-            © 2025 TechArchive. Tüm hakları saklıdır.
+            © 2025 EngiCareer. Tüm hakları saklıdır.
           </p>
           <p className="text-slate-400 text-sm flex gap-1">
-             Designed by <span className="text-slate-600 font-medium">TechArchive Team</span>
+             Designed by <span className="text-slate-600 font-medium">EngiCareer Team</span>
           </p>
         </div>
       </div>
